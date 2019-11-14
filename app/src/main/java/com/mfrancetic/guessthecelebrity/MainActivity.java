@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<String> celebrityNameList = new ArrayList<>();
 
-    private int taskCounter = 0;
+    private int currentTask;
 
     private Random random;
 
@@ -46,14 +46,14 @@ public class MainActivity extends AppCompatActivity {
     private Button button2;
 
     private Button button3;
-    
+
     private int locationOfCorrectAnswer;
 
     private ArrayList<String> answerNameList;
 
     private static final String answerNameListTag = "answerNameList";
 
-    private static final String taskCounterTag = "taskCounter";
+    private static final String currentTaskTag = "currentTask";
 
     private static final String websiteContentTag = "websiteContent";
 
@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String celebrityNameListTag = "celebrityNameList";
 
     private static final String locationOfCorrectAnswerTag = "locationOfCorrectAnswer";
+
+    private int celebrityListBound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,20 +77,25 @@ public class MainActivity extends AppCompatActivity {
         button3 = findViewById(R.id.button3);
 
         if (savedInstanceState != null) {
-            taskCounter = savedInstanceState.getInt(taskCounterTag);
+            currentTask = savedInstanceState.getInt(currentTaskTag);
             websiteContent = savedInstanceState.getString(websiteContent);
             celebrityPhotoUrlList = savedInstanceState.getStringArrayList(celebrityPhotoUrlListTag);
             celebrityNameList = savedInstanceState.getStringArrayList(celebrityNameListTag);
+            if (celebrityNameList != null) {
+                celebrityListBound = celebrityNameList.size() - 1;
+            }
             answerNameList = savedInstanceState.getStringArrayList(answerNameListTag);
             locationOfCorrectAnswer = savedInstanceState.getInt(locationOfCorrectAnswerTag);
-            createNewCelebrityPhoto(taskCounter);
+            createNewCelebrityPhoto(currentTask);
             populateAnswerList(answerNameList);
         } else {
             websiteContent = getWebsiteContent();
             if (websiteContent != null) {
                 celebrityPhotoUrlList = getCelebrityPhotoUrlList(websiteContent);
                 celebrityNameList = getCelebrityNameList(websiteContent);
-                createNewTask(taskCounter);
+                celebrityListBound = celebrityNameList.size() - 1;
+                currentTask = getCurrentTask();
+                createNewTask(currentTask);
             }
         }
     }
@@ -201,9 +208,9 @@ public class MainActivity extends AppCompatActivity {
             if (i == locationOfCorrectAnswer) {
                 answerNameList.add(celebrityNameList.get(correctAnswer));
             } else {
-                wrongAnswer = random.nextInt(celebrityNameList.size() - 1);
+                wrongAnswer = random.nextInt(celebrityListBound);
                 while (wrongAnswer == correctAnswer) {
-                    wrongAnswer = random.nextInt(celebrityNameList.size() - 1);
+                    wrongAnswer = random.nextInt(celebrityListBound);
                 }
                 name = celebrityNameList.get(wrongAnswer);
                 answerNameList.add(name);
@@ -218,11 +225,11 @@ public class MainActivity extends AppCompatActivity {
         if (isAnswerCorrect(tag)) {
             toast = getString(R.string.answer_correct);
         } else {
-            toast = getString(R.string.answer_wrong) + " " + celebrityNameList.get(taskCounter);
+            toast = getString(R.string.answer_wrong) + " " + celebrityNameList.get(currentTask);
         }
         Toast.makeText(this, toast, Toast.LENGTH_SHORT).show();
-        taskCounter++;
-        createNewTask(taskCounter);
+        currentTask = getCurrentTask();
+        createNewTask(currentTask);
     }
 
     private boolean isAnswerCorrect(int tag) {
@@ -231,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putInt(taskCounterTag, taskCounter);
+        outState.putInt(currentTaskTag, currentTask);
         outState.putString(websiteContentTag, websiteContent);
         outState.putStringArrayList(celebrityPhotoUrlListTag, celebrityPhotoUrlList);
         outState.putStringArrayList(celebrityNameListTag, celebrityNameList);
@@ -245,5 +252,14 @@ public class MainActivity extends AppCompatActivity {
         button1.setText(nameList.get(1));
         button2.setText(nameList.get(2));
         button3.setText(nameList.get(3));
+    }
+
+    private int getCurrentTask() {
+        random = new Random();
+        int newTask = random.nextInt(celebrityListBound);
+        while (newTask == currentTask) {
+            newTask = random.nextInt(celebrityListBound);
+        }
+        return newTask;
     }
 }
