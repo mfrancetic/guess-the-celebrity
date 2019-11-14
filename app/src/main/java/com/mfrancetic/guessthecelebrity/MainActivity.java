@@ -1,5 +1,6 @@
 package com.mfrancetic.guessthecelebrity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Bitmap;
@@ -45,8 +46,22 @@ public class MainActivity extends AppCompatActivity {
     private Button button2;
 
     private Button button3;
-
+    
     private int locationOfCorrectAnswer;
+
+    private ArrayList<String> answerNameList;
+
+    private static final String answerNameListTag = "answerNameList";
+
+    private static final String taskCounterTag = "taskCounter";
+
+    private static final String websiteContentTag = "websiteContent";
+
+    private static final String celebrityPhotoUrlListTag = "celebrityPhotoUrlList";
+
+    private static final String celebrityNameListTag = "celebrityNameList";
+
+    private static final String locationOfCorrectAnswerTag = "locationOfCorrectAnswer";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +74,22 @@ public class MainActivity extends AppCompatActivity {
         button2 = findViewById(R.id.button2);
         button3 = findViewById(R.id.button3);
 
-        websiteContent = getWebsiteContent();
-        if (websiteContent != null) {
-            celebrityPhotoUrlList = getCelebrityPhotoUrlList(websiteContent);
-            celebrityNameList = getCelebrityNameList(websiteContent);
-            createNewTask(taskCounter);
+        if (savedInstanceState != null) {
+            taskCounter = savedInstanceState.getInt(taskCounterTag);
+            websiteContent = savedInstanceState.getString(websiteContent);
+            celebrityPhotoUrlList = savedInstanceState.getStringArrayList(celebrityPhotoUrlListTag);
+            celebrityNameList = savedInstanceState.getStringArrayList(celebrityNameListTag);
+            answerNameList = savedInstanceState.getStringArrayList(answerNameListTag);
+            locationOfCorrectAnswer = savedInstanceState.getInt(locationOfCorrectAnswerTag);
+            createNewCelebrityPhoto(taskCounter);
+            populateAnswerList(answerNameList);
+        } else {
+            websiteContent = getWebsiteContent();
+            if (websiteContent != null) {
+                celebrityPhotoUrlList = getCelebrityPhotoUrlList(websiteContent);
+                celebrityNameList = getCelebrityNameList(websiteContent);
+                createNewTask(taskCounter);
+            }
         }
     }
 
@@ -167,26 +193,23 @@ public class MainActivity extends AppCompatActivity {
 
     private void createNewCelebrityNameList(int correctAnswer) {
         String name;
-        ArrayList<String> nameList = new ArrayList<>();
+        answerNameList = new ArrayList<>();
         random = new Random();
         int wrongAnswer;
         locationOfCorrectAnswer = random.nextInt(4);
         for (int i = 0; i < 4; i++) {
             if (i == locationOfCorrectAnswer) {
-                nameList.add(celebrityNameList.get(correctAnswer));
+                answerNameList.add(celebrityNameList.get(correctAnswer));
             } else {
                 wrongAnswer = random.nextInt(celebrityNameList.size() - 1);
                 while (wrongAnswer == correctAnswer) {
                     wrongAnswer = random.nextInt(celebrityNameList.size() - 1);
                 }
                 name = celebrityNameList.get(wrongAnswer);
-                nameList.add(name);
+                answerNameList.add(name);
             }
         }
-        button0.setText(nameList.get(0));
-        button1.setText(nameList.get(1));
-        button2.setText(nameList.get(2));
-        button3.setText(nameList.get(3));
+        populateAnswerList(answerNameList);
     }
 
     public void chooseAnswer(View view) {
@@ -204,5 +227,23 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isAnswerCorrect(int tag) {
         return tag == locationOfCorrectAnswer;
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putInt(taskCounterTag, taskCounter);
+        outState.putString(websiteContentTag, websiteContent);
+        outState.putStringArrayList(celebrityPhotoUrlListTag, celebrityPhotoUrlList);
+        outState.putStringArrayList(celebrityNameListTag, celebrityNameList);
+        outState.putStringArrayList(answerNameListTag, answerNameList);
+        outState.putInt(locationOfCorrectAnswerTag, locationOfCorrectAnswer);
+        super.onSaveInstanceState(outState);
+    }
+
+    private void populateAnswerList(ArrayList<String> nameList) {
+        button0.setText(nameList.get(0));
+        button1.setText(nameList.get(1));
+        button2.setText(nameList.get(2));
+        button3.setText(nameList.get(3));
     }
 }
