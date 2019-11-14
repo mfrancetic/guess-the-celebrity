@@ -6,8 +6,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -36,13 +38,13 @@ public class MainActivity extends AppCompatActivity {
 
     private Random random;
 
+    private Button button0;
+
     private Button button1;
 
     private Button button2;
 
     private Button button3;
-
-    private Button button4;
 
     private int locationOfCorrectAnswer;
 
@@ -52,16 +54,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         imageView = findViewById(R.id.celebrity_image_view);
+        button0 = findViewById(R.id.button0);
         button1 = findViewById(R.id.button1);
         button2 = findViewById(R.id.button2);
         button3 = findViewById(R.id.button3);
-        button4 = findViewById(R.id.button4);
 
         websiteContent = getWebsiteContent();
         if (websiteContent != null) {
             celebrityPhotoUrlList = getCelebrityPhotoUrlList(websiteContent);
             celebrityNameList = getCelebrityNameList(websiteContent);
-            createNewTask(celebrityPhotoUrlList.get(taskCounter), celebrityNameList);
+            createNewTask(taskCounter);
         }
     }
 
@@ -109,9 +111,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void createNewTask(String photoUrl, ArrayList<String> celebrityNameList) {
-        createNewCelebrityPhoto(photoUrl);
-        createNewCelebrityNameList(celebrityNameList, taskCounter);
+    private void createNewTask(int taskCounter) {
+        createNewCelebrityPhoto(taskCounter);
+        createNewCelebrityNameList(taskCounter);
     }
 
     private String getWebsiteContent() {
@@ -151,7 +153,8 @@ public class MainActivity extends AppCompatActivity {
         return celebrityNameList;
     }
 
-    private void createNewCelebrityPhoto(String url) {
+    private void createNewCelebrityPhoto(int taskCounter) {
+        String url = celebrityPhotoUrlList.get(taskCounter);
         DownloadCelebrityImageTask downloadCelebrityImageTask = new DownloadCelebrityImageTask();
         Bitmap bitmap;
         try {
@@ -162,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void createNewCelebrityNameList(ArrayList<String> celebrityNameList, int correctAnswer) {
+    private void createNewCelebrityNameList(int correctAnswer) {
         String name;
         ArrayList<String> nameList = new ArrayList<>();
         random = new Random();
@@ -180,9 +183,26 @@ public class MainActivity extends AppCompatActivity {
                 nameList.add(name);
             }
         }
-        button1.setText(nameList.get(0));
-        button2.setText(nameList.get(1));
-        button3.setText(nameList.get(2));
-        button4.setText(nameList.get(3));
+        button0.setText(nameList.get(0));
+        button1.setText(nameList.get(1));
+        button2.setText(nameList.get(2));
+        button3.setText(nameList.get(3));
+    }
+
+    public void chooseAnswer(View view) {
+        int tag = Integer.parseInt(view.getTag().toString());
+        String toast;
+        if (isAnswerCorrect(tag)) {
+            toast = getString(R.string.answer_correct);
+        } else {
+            toast = getString(R.string.answer_wrong) + " " + celebrityNameList.get(taskCounter);
+        }
+        Toast.makeText(this, toast, Toast.LENGTH_SHORT).show();
+        taskCounter++;
+        createNewTask(taskCounter);
+    }
+
+    private boolean isAnswerCorrect(int tag) {
+        return tag == locationOfCorrectAnswer;
     }
 }

@@ -16,26 +16,34 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <Button
+        android:id="@+id/button0"
         style="@style/ButtonStyle"
-        android:id="@+id/button1"
         android:layout_marginBottom="@dimen/margin_between_items"
+        android:onClick="chooseAnswer"
+        android:tag="0"
         tools:text="Daniel Radcliffe" />
 
     <Button
+        android:id="@+id/button1"
         style="@style/ButtonStyle"
-        android:id="@+id/button2"
         android:layout_marginBottom="@dimen/margin_between_items"
+        android:onClick="chooseAnswer"
+        android:tag="1"
         tools:text="Emma Watson" />
 
     <Button
+        android:id="@+id/button2"
         style="@style/ButtonStyle"
-        android:id="@+id/button3"
         android:layout_marginBottom="@dimen/margin_between_items"
+        android:onClick="chooseAnswer"
+        android:tag="2"
         tools:text="Rupert Grunt" />
 
     <Button
+        android:id="@+id/button3"
         style="@style/ButtonStyle"
-        android:id="@+id/button4"
+        android:onClick="chooseAnswer"
+        android:tag="3"
         tools:text="Alan Rickmann" />
 
 </LinearLayout>
