@@ -63,6 +63,14 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String locationOfCorrectAnswerTag = "locationOfCorrectAnswer";
 
+    private static final String photoUrlPattern = "<img src=\"(.*?)\"";
+
+    private static final String namePattern = "alt=\"(.*?)\"";
+
+    private static final String photoUrlFilter = ":profile/";
+
+    private static final String websiteUrl = "http://www.posh24.se/kandisar";
+
     private int celebrityListBound;
 
     @Override
@@ -153,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         DownloadWebsiteContentTask downloadWebsiteContentTask = new DownloadWebsiteContentTask();
         String result = null;
         try {
-            result = downloadWebsiteContentTask.execute("http://www.posh24.se/kandisar").get();
+            result = downloadWebsiteContentTask.execute(websiteUrl).get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -161,13 +169,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ArrayList<String> getCelebrityPhotoUrlList(String websiteContent) {
-        pattern = Pattern.compile("<img src=\"(.*?)\"");
+        pattern = Pattern.compile(photoUrlPattern);
         String celebrityPhotoUrl;
         ArrayList<String> celebrityPhotoUrlList = new ArrayList<>();
         matcher = pattern.matcher(websiteContent);
         while (matcher.find()) {
             celebrityPhotoUrl = matcher.group(1);
-            if (celebrityPhotoUrl != null && celebrityPhotoUrl.contains(":profile/")) {
+            if (celebrityPhotoUrl != null && celebrityPhotoUrl.contains(photoUrlFilter)) {
                 celebrityPhotoUrlList.add(celebrityPhotoUrl);
             }
         }
@@ -175,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ArrayList<String> getCelebrityNameList(String websiteContent) {
-        pattern = Pattern.compile("alt=\"(.*?)\"");
+        pattern = Pattern.compile(namePattern);
         String name;
         ArrayList<String> celebrityNameList = new ArrayList<>();
         matcher = pattern.matcher(websiteContent);
